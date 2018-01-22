@@ -37,7 +37,6 @@ export class HomePage {
 
 
   add(){
-
       let profileModal = this.modalCtrl.create('AddPage');
        profileModal.onDidDismiss(data => {
         this.getList()
@@ -72,6 +71,7 @@ export class HomePage {
   }
 
   game(){
+    this.storage.set('adv',1);
     this.navCtrl.push('GamePage');
   }
 

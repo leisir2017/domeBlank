@@ -3,12 +3,13 @@ import { Platform, Nav, IonicApp, Keyboard, AlertController,ToastController } fr
 import { StatusBar } from '@ionic-native/status-bar';
 import { SplashScreen } from '@ionic-native/splash-screen';
 import { NativeProvider } from '../providers/native/native';
+import { Storage } from '@ionic/storage';
 
 @Component({
   templateUrl: 'app.html'
 })
 export class MyApp {
-  rootPage:any = 'HomePage';
+  rootPage:any = '';
   backButtonPressed: boolean = false;  //用于判断返回键是否触发
   @ViewChild('myNav') nav: Nav;
 
@@ -18,9 +19,19 @@ export class MyApp {
   public alertCtrl: AlertController,
   private toastCtrl: ToastController,
   private native: NativeProvider,
+  private storage: Storage,
   public platform: Platform, 
   private statusBar: StatusBar,
   splashScreen: SplashScreen) {
+
+    this.storage.get("adv").then((val) => {
+      if(val){
+        this.rootPage = 'WelcomePage';
+      }else{
+        this.rootPage = 'HomePage';
+      }
+    })
+
     platform.ready().then(() => {
       // Okay, so the platform is ready and our plugins are available.
       // Here you can do any higher level native things you might need.
