@@ -1,0 +1,60 @@
+<!--
+  Generated template for the WePage page.
+
+  See http://ionicframework.com/docs/components/#navigation for more info on
+  Ionic pages and navigation.
+-->
+<ion-header>
+
+  <ion-navbar>
+    <ion-title>个人中心</ion-title>
+  </ion-navbar>
+
+</ion-header>
+
+
+<ion-content padding>
+	<ion-list class="mine-header">
+    <button ion-item (click)="edit()">
+      <ion-thumbnail item-left (click)="viewAvatar();$event.stopPropagation()">
+        <img [src]="userInfo?.avatar">
+      </ion-thumbnail>
+      <div>{{userInfo?.username}}</div>
+      <div class="description">{{userInfo?.username}}</div>
+    </button>
+  </ion-list>
+  <ion-list>
+    <button ion-item (click)="mylist()">
+      <ion-icon name="md-list" item-left color="primary"></ion-icon>
+      我的微博
+    </button>
+    <button ion-item (click)="setting()">
+      <ion-icon name="settings" item-left color="primary"></ion-icon>
+      设置
+    </button>
+    <button ion-item (click)="map()">
+      <ion-icon name="map" item-left color="bright"></ion-icon>
+      工作地图
+    </button>
+    <button ion-item (click)="clearCache()">
+      <ion-icon name="md-photos" item-left style="color: #6fc572;"></ion-icon>
+      清空缓存
+    </button>
+  </ion-list>
+  <ion-list>
+    <button ion-item (click)="exitSoftware()" hideWhen="ios" detail-none>
+      <ion-icon name="log-out" item-left color="danger"></ion-icon>
+      退出软件
+    </button>
+    <button ion-item (click)="loginOut()" detail-none>
+      <ion-icon name="log-in" item-left color="danger"></ion-icon>
+      重新登录
+    </button>
+  </ion-list>
+  <ion-list>
+    <button ion-item (click)="about()">
+      <ion-icon name="information-circle" item-left color="secondary"></ion-icon>
+      关于
+    </button>
+  </ion-list>
+</ion-content>
