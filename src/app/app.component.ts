@@ -45,6 +45,9 @@ export class MyApp {
   }
 
   registerBackButtonAction() {
+      if (!this.native.isAndroid()) {
+        return;
+      }
      this.platform.registerBackButtonAction(() => {
       
       
@@ -54,39 +57,39 @@ export class MyApp {
         return ;
       }
 
+      
+
+
       //如果想点击返回按钮隐藏toast或loading或Overlay就把下面加上
-      // this.ionicApp._toastPortal.getActive() ||this.ionicApp._loadingPortal.getActive()|| this.ionicApp._overlayPortal.getActive()
+      this.ionicApp._toastPortal.getActive() ||this.ionicApp._loadingPortal.getActive()|| this.ionicApp._overlayPortal.getActive()
       let activePortal = this.ionicApp._modalPortal.getActive() || this.ionicApp._toastPortal.getActive() || this.ionicApp._overlayPortal.getActive();
       if (activePortal) {
         activePortal.dismiss();
         return;
       }
 
-      return this.nav.pop() ? this.nav.pop() : this.showExit();
+      let activeVC = this.nav.getActive();
+      let activeNav = activeVC.getNav();
+      return activeNav.canGoBack() ? activeNav.pop() : this.showExit();
+
        
 
      }, 1);
    }
 
-   //退出提示框
-   showExit() {
-   let thisplatform = this.platform;
-
-   if (this.backButtonPressed) { //当触发标志为true时，即2秒内双击返回按键则退出APP
-      thisplatform.exitApp();
-    
+   //双击退出提示框
+  showExit() {
+    if (this.backButtonPressed) { //当触发标志为true时，即2秒内双击返回按键则退出APP
+      this.platform.exitApp();
     } else {
+      this.native.showToast('再按一次退出应用');
       this.backButtonPressed = true;
-      this.toastCtrl.create({
-        message: '再按一次退出应用',
-        duration: 2000
-      }).present();
-
       setTimeout(() => { //2秒内没有再次点击返回则将触发标志标记为false
         this.backButtonPressed = false;
       }, 2000)
     }
-   }
+  }
+
   
 }
 

@@ -1,13 +1,22 @@
 <ion-header>
 
   <ion-navbar>
-    <ion-title>you</ion-title>
+    <ion-title>我的微博</ion-title>
   </ion-navbar>
 
 </ion-header>
 
 <ion-content padding>
-	<p>
-    If you get lost, the <a href="http://ionicframework.com/docs/v2">docs</a> will be your guide.
-  </p>
+	<ion-list>
+	  <ion-item *ngFor="let item of lists, let i = index">
+		  <ion-thumbnail item-start>
+	      <img *ngIf="item.images.length > 0" src="{{ item.images[0] }}">
+	      <img *ngIf="item.images.length == 0" src="assets/imgs/avatar.png">
+	    </ion-thumbnail>
+	    <h2>{{ item.title }}</h2>
+	    <p>发布日期：{{ item.addtime }}</p>
+	    <button ion-button clear item-end (click)="info(item)">查看</button>
+	  </ion-item>
+
+	</ion-list>
 </ion-content>

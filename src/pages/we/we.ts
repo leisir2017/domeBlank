@@ -1,5 +1,5 @@
 import { Component } from '@angular/core';
-import { IonicPage, NavController, NavParams } from 'ionic-angular';
+import { Platform,IonicPage, NavController, NavParams, ModalController } from 'ionic-angular';
 import { User } from '../../model/user';
 import { ListPage } from '../list/list';
 import { Storage } from '@ionic/storage';
@@ -18,7 +18,14 @@ import { NativeProvider } from '../../providers/native/native';
 })
 export class WePage {
   userInfo : any = {};
-  constructor(public navCtrl: NavController, public navParams: NavParams, public user: User, public storage: Storage, public nativeProvider: NativeProvider) {
+  constructor(
+  public navCtrl: NavController, 
+  public modalCtrl: ModalController, 
+  public navParams: NavParams,
+  public user: User,
+  public storage: Storage,
+  public platform: Platform,
+  public nativeProvider: NativeProvider) {
   }
 
   ionViewDidLoad() {
@@ -35,17 +42,33 @@ export class WePage {
   }
 
    mylist() {
-      this.navCtrl.push(ListPage,{username:this.user.username})
+      this.navCtrl.push('ListPage')
+    }
+
+   viewAvatar(index) {
+      let picturePaths = [this.userInfo.avatar];
+      this.modalCtrl.create('ImgviewPage', {'initialSlide': index, 'picturePaths': picturePaths}).present();
     }
 
    edit() {
+      this.navCtrl.push('InfoPage')
+    }
+
+   about() {
+      this.navCtrl.push('AboutPage')
+    }
+   send() {
+      this.navCtrl.push('SendPage')
     }
 
   setting() {
   }
 
-  exitSoftware(){
+  miniSoft(){
     this.nativeProvider.minimize();
+  }
+  exitSoftware(){
+      this.platform.exitApp();
   }
 
 }

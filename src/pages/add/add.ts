@@ -2,6 +2,7 @@ import { Component } from '@angular/core';
 import { IonicPage, NavController, NavParams, ViewController, ModalController, AlertController, LoadingController,ActionSheetController } from 'ionic-angular';
 import { Storage } from '@ionic/storage';
 import { NativeProvider } from '../../providers/native/native';
+import { User } from '../../model/user';
 
 @IonicPage()
 @Component({
@@ -10,6 +11,7 @@ import { NativeProvider } from '../../providers/native/native';
 })
 export class AddPage {
   data : any = {};
+  geo : any = {};
   allowDelete : any = true;
   constructor(
   	public navCtrl: NavController,
@@ -18,6 +20,7 @@ export class AddPage {
     public alertCtrl: AlertController,
     public modalCtrl: ModalController,
     public storage: Storage,
+    public user: User,
   	public nativeProvider: NativeProvider,
     public viewCtrl: ViewController,
     public navParams: NavParams) {
@@ -26,8 +29,32 @@ export class AddPage {
   ionViewDidLoad() {
 
   }
+
+  local(){
+
+    this.nativeProvider.getUserLocation().subscribe((resp) => {
+      this.storage.set('geolocation',resp);
+      this.geo = resp;
+      this.data.city = resp.province + resp.road;
+      this.data.address = resp.address;
+    },error=>{
+      this.data.city = '未知';
+      this.data.address = '未知';
+    });
+
+  }
+
   ionViewWillLoad() {
     this.data.images = [];
+    this.storage.get('geolocation').then((val) => {
+      if(val || val != ''){
+        this.geo = val;
+        this.data.city = val.province + val.road;
+        this.data.address = val.address;
+      }else{
+        this.local();
+      }
+    })
   }
   
   add(){
@@ -46,21 +73,21 @@ export class AddPage {
         nowdate = nowdate.replace("/",'-').replace("/",'-');
     loader.present();
       this.data.id = new Date().getTime();
-      this.data.username = 'leisir';
+      this.data.username = this.user.username;
       this.data.addtime = nowdate
       this.data.like = 0;
-      this.data.city = '武汉';
+      
 
    this.storage.get('lists')
   .then((val)=>{
-    console.log(val)
     if(val){
-      if(!val){
-        val[nowdate] = [];
+      let v = val ;
+      if(!val[nowdate]){
+        v[nowdate] = [this.data];
+      }else{
+        v[nowdate].push(this.data)
       }
-      let datas = val;
-      datas[nowdate].push(this.data);
-      this.storage.set('lists',datas);
+      this.storage.set('lists',v);
     }else{
       let datas = {};
       datas[nowdate] = [this.data];

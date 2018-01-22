@@ -21,6 +21,10 @@
 	  <textarea  class="mytextarea" placeholder="内容" [(ngModel)]="data.content"></textarea>
 	  </ion-item>
 
+	  <ion-item class="noborder">
+	  <ion-icon name="pin"></ion-icon> {{geo.address}}
+	  </ion-item>
+
 	</ion-list>
 
 	<div class="clear-fix" style="padding-top: 2px;padding-left: 16px;" *ngIf="data.images">

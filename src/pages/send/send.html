@@ -7,12 +7,31 @@
 <ion-header>
 
   <ion-navbar>
-    <ion-title>send</ion-title>
+    <ion-title>信息反馈</ion-title>
   </ion-navbar>
 
 </ion-header>
 
 
 <ion-content padding>
+  <ion-list>
+    <ion-item *ngFor="let item of lists, let i = index">
+      <h2>{{ item.msg }}</h2>
+      <p>发布日期：{{ item.addtime }}</p>
+      <button ion-button clear item-end (click)="info(item)">查看</button>
+    </ion-item>
 
+  </ion-list>
 </ion-content>
+
+<ion-footer>
+  <ion-toolbar>
+    <input class="myinput" [(ngModel)]="msg" type="text" placeholder="输入信息">
+    <ion-buttons end>
+      <button ion-button icon-right color="royal" (click)="send()">
+        发送
+        <ion-icon name="send"></ion-icon>
+      </button>
+    </ion-buttons>
+  </ion-toolbar>
+</ion-footer>

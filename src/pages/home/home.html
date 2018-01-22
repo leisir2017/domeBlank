@@ -19,9 +19,19 @@
   </ion-slides>
 
   <ion-fab center bottom>
-   <button ion-fab (click)="add()"><ion-icon name="add"></ion-icon></button>
+   <button ion-fab><ion-icon name="add"></ion-icon></button>
+   <ion-fab-list side="top">
+      <button ion-fab (click)="add()"><ion-icon name="send"></ion-icon></button>
+    </ion-fab-list>
+   <ion-fab-list side="left">
+      <button ion-fab (click)="qrcanner()"><ion-icon name="qr-scanner"></ion-icon></button>
+    </ion-fab-list>
+   <ion-fab-list side="right">
+      <button ion-fab (click)="game()"><ion-icon name="game-controller-b"></ion-icon></button>
+    </ion-fab-list>
+
   </ion-fab>
-  <ion-fab center bottom style="bottom: 100px;">
+  <ion-fab center bottom style="bottom: 150px;">
    <button ion-fab (click)="local()">{{ localtion }}</button>
   </ion-fab>
   <div class="home-container">

@@ -6,9 +6,13 @@ import { Network } from '@ionic-native/network';
 import { Camera, CameraOptions } from "@ionic-native/camera";
 import { File, FileEntry } from "@ionic-native/file";
 import { FileTransfer, FileTransferObject } from "@ionic-native/file-transfer";
-import { Observable } from "rxjs/Observable";
+import { Observable } from "rxjs";
 import { FileOpener } from '@ionic-native/file-opener';
 import { ImagePicker } from "@ionic-native/image-picker";
+import { Diagnostic } from "@ionic-native/diagnostic";
+import { BarcodeScanner } from "@ionic-native/barcode-scanner";
+
+declare var LocationPlugin;
 
 /*
   Generated class for the NativeProvider provider.
@@ -22,7 +26,7 @@ export class NativeProvider {
   private loadingIsOpen: boolean = false;
   constructor(
   		private appMinimize: AppMinimize,
-	   private platform: Platform,
+	    private platform: Platform,
       private camera: Camera,
       private transfer: FileTransfer,
       private fileOpener: FileOpener,
@@ -30,6 +34,8 @@ export class NativeProvider {
       private file: File,
       private toastCtrl: ToastController,
       private alertCtrl: AlertController,
+      private diagnostic: Diagnostic,
+      private barcodeScanner: BarcodeScanner,
       private loadingCtrl: LoadingController,
       private toast: Toast,
 	  private network: Network
@@ -94,6 +100,21 @@ export class NativeProvider {
       buttons: [{text: '确定'}],
       enableBackdropDismiss: false
     }).present();
+  }
+
+  /**
+   * 扫描二维码
+   * @returns {any}
+   */
+  scan() {
+    return Observable.create(observer => {
+      this.barcodeScanner.scan().then((barcodeData) => {
+        observer.next(barcodeData.text);
+      }).catch(err => {
+        console.log(err, '扫描二维码失败');
+        observer.error(false);
+      });
+    });
   }
 
 
@@ -246,5 +267,137 @@ export class NativeProvider {
     });
   }
 
+
+  /**
+   * 获得用户当前坐标信息
+   */
+  getUserLocation() {
+    return Observable.create(observer => {
+      if (this.isMobile()) {
+        Observable.zip(this.assertLocationService(), this.assertLocationAuthorization()).subscribe(() => {
+          LocationPlugin.getLocation(data => {
+            //data形如:{"locationType":4,"latitude":23.119225,"longitude":113.350784,"hasAccuracy":true,"accuracy":29,"address":"广东省广州市天河区潭乐街靠近广电科技大厦","country":"中国","province":"广东省","city":"广州市","district":"天河区","street":"平云路","cityCode":"020","adCode":"440106","aoiName":"广电平云广场","speed":0,"bearing":0,"time":1515976535559}
+            //其中locationType为定位来源.定位类型对照表: http://lbs.amap.com/api/android-location-sdk/guide/utilities/location-type/
+            //console.log('定位信息', data);
+            //this.alert( JSON.stringify(data) )
+            observer.next(data);
+          }, msg => {
+            if (msg.indexOf('缺少定位权限') != -1 || (this.isIos() && msg.indexOf('定位失败') != -1)) {
+              this.alertCtrl.create({
+                title: '缺少定位权限',
+                subTitle: '请在手机设置或app权限管理中开启',
+                buttons: [{text: '取消'},
+                  {
+                    text: '去开启',
+                    handler: () => {
+                      this.diagnostic.switchToSettings();
+                    }
+                  }
+                ]
+              }).present();
+            } else if (msg.indexOf('WIFI信息不足') != -1) {
+              alert('定位失败,请确保连上WIFI或者关掉WIFI只开流量数据')
+            } else if (msg.indexOf('网络连接异常') != -1) {
+              alert('网络连接异常,请检查您的网络是否畅通')
+            } else {
+              alert('获取位置错误,错误消息:' + msg);
+              console.log(msg, '获取位置失败');
+            }
+            observer.error('获取位置失败');
+          });
+        }, err => {
+          observer.error(err);
+        })
+      } else {
+        console.log('非手机环境,即测试环境返回固定坐标');
+        observer.next({'lng': 113.350912, 'lat': 23.119495,'province':'湖北省','road':'珞喻路','address':'湖北省武汉市洪山区珞喻路'});
+      }
+    });
+  }
+
+
+  //检测app位置服务是否开启
+  private assertLocationService = (() => {
+    let enabledLocationService = false;//手机是否开启位置服务
+    return () => {
+      return Observable.create(observer => {
+        if (enabledLocationService) {
+          observer.next(true);
+        } else {
+          this.diagnostic.isLocationEnabled().then(enabled => {
+            if (enabled) {
+              enabledLocationService = true;
+              observer.next(true);
+            } else {
+              enabledLocationService = false;
+              this.alertCtrl.create({
+                title: '您未开启位置服务',
+                subTitle: '正在获取位置信息',
+                buttons: [{text: '取消'},
+                  {
+                    text: '去开启',
+                    handler: () => {
+                      this.diagnostic.switchToLocationSettings();
+                    }
+                  }
+                ]
+              }).present();
+              observer.error(false);
+            }
+          }).catch(err => {
+            observer.error(false);
+          });
+        }
+      });
+    };
+  })();
+
+  //检测app是否有定位权限,如果没有权限则会请求权限
+  private assertLocationAuthorization = (() => {
+    let locationAuthorization = false;
+    return () => {
+      return Observable.create(observer => {
+        if (locationAuthorization) {
+          observer.next(true);
+        } else {
+          this.diagnostic.isLocationAuthorized().then(res => {
+            if (res) {
+              locationAuthorization = true;
+              observer.next(true);
+            } else {
+              locationAuthorization = false;
+              this.diagnostic.requestLocationAuthorization('always').then(res => {//请求定位权限
+                if (res == 'DENIED_ALWAYS') {//拒绝访问状态,必须手动开启
+                  locationAuthorization = false;
+                  this.alertCtrl.create({
+                    title: '缺少定位权限',
+                    subTitle: '请在手机设置或app权限管理中开启',
+                    buttons: [{text: '取消'},
+                      {
+                        text: '去开启',
+                        handler: () => {
+                          this.diagnostic.switchToSettings();
+                        }
+                      }
+                    ]
+                  }).present();
+                  observer.error(false);
+                } else {
+                  locationAuthorization = true;
+                  observer.next(true);
+                }
+              }).catch(err => {
+                console.log(err, '调用diagnostic.requestLocationAuthorization方法失败');
+                observer.error(false);
+              });
+            }
+          }).catch(err => {
+            console.log(err, '调用diagnostic.isLocationAvailable方法失败');
+            observer.error(false);
+          });
+        }
+      });
+    };
+  })();
 
 }

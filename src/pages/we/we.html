@@ -15,13 +15,13 @@
 
 <ion-content padding>
 	<ion-list class="mine-header">
-    <button ion-item (click)="edit()">
-      <ion-thumbnail item-left (click)="viewAvatar();$event.stopPropagation()">
+    <div ion-item>
+      <ion-thumbnail item-left (click)="viewAvatar(0)">
         <img [src]="userInfo?.avatar">
       </ion-thumbnail>
-      <div>{{userInfo?.username}}</div>
-      <div class="description">{{userInfo?.username}}</div>
-    </button>
+      <div (click)="edit()">{{userInfo?.username}}</div>
+      <div class="description" (click)="edit()">{{userInfo?.intro}}</div>
+    </div>
   </ion-list>
   <ion-list>
     <button ion-item (click)="mylist()">
@@ -32,29 +32,32 @@
       <ion-icon name="settings" item-left color="primary"></ion-icon>
       设置
     </button>
-    <button ion-item (click)="map()">
-      <ion-icon name="map" item-left color="bright"></ion-icon>
-      工作地图
-    </button>
+    
     <button ion-item (click)="clearCache()">
-      <ion-icon name="md-photos" item-left style="color: #6fc572;"></ion-icon>
+     <ion-icon name="md-archive" item-left style="color: #6fc572;"></ion-icon>
       清空缓存
     </button>
   </ion-list>
+
   <ion-list>
-    <button ion-item (click)="exitSoftware()" hideWhen="ios" detail-none>
+    <button ion-item (click)="exitSoftware()" >
       <ion-icon name="log-out" item-left color="danger"></ion-icon>
       退出软件
     </button>
-    <button ion-item (click)="loginOut()" detail-none>
-      <ion-icon name="log-in" item-left color="danger"></ion-icon>
-      重新登录
+    <button ion-item (click)="miniSoft()" >
+      <ion-icon name="log-out" item-left color="danger"></ion-icon>
+      最小化
     </button>
+    
   </ion-list>
   <ion-list>
     <button ion-item (click)="about()">
       <ion-icon name="information-circle" item-left color="secondary"></ion-icon>
       关于
+    </button>
+    <button ion-item (click)="send()">
+      <ion-icon name="send" item-left color="secondary"></ion-icon>
+      信息反馈
     </button>
   </ion-list>
 </ion-content>

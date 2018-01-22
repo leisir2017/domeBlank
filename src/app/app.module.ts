@@ -7,9 +7,10 @@ import { AppMinimize } from "@ionic-native/app-minimize";
 import { Network } from "@ionic-native/network";
 import { Toast } from "@ionic-native/toast";
 import { IonicStorageModule } from '@ionic/storage';
+import { Diagnostic } from "@ionic-native/diagnostic";
 import { Geolocation } from '@ionic-native/geolocation';
+import { BarcodeScanner } from "@ionic-native/barcode-scanner";
 import { MyApp } from './app.component';
-
 
 import { Camera } from "@ionic-native/camera";
 import { File } from "@ionic-native/file";
@@ -45,7 +46,9 @@ import { User } from '../model/user';
     FileTransfer,
     FileOpener,
     ImagePicker,
+    Diagnostic,
     Geolocation,
+    BarcodeScanner,
     {provide: ErrorHandler, useClass: IonicErrorHandler},
     NativeProvider,
     UsertableProvider,

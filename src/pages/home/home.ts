@@ -2,8 +2,8 @@ import { Component } from '@angular/core';
 import { IonicPage, NavController, ModalController } from 'ionic-angular';
 import { Storage } from '@ionic/storage';
 import { User } from '../../model/user';
-import { Geolocation } from '@ionic-native/geolocation';
 import { NativeProvider } from '../../providers/native/native';
+import { Geolocation } from '@ionic-native/geolocation';
 
 @IonicPage()
 @Component({
@@ -14,7 +14,7 @@ import { NativeProvider } from '../../providers/native/native';
 export class HomePage {
   lists:any=[];
   colors: any = [];
-  localtion: string = '定位中..';
+  localtion: string = '定位';
   backgrounds = [
     'assets/imgs/background/background-1.jpg',
     'assets/imgs/background/background-2.jpg',
@@ -60,35 +60,36 @@ export class HomePage {
       this.user.email = '598627144@qq.com';
       this.user.phone = '15927215787';
       this.user.location = '武汉';
-      let that = this;
-      this.geolocation.getCurrentPosition().then((resp) => {
-        console.log(resp)
-        //console.log(resp.coords.latitude)
-       // resp.coords.latitude
-       // resp.coords.longitude
-        that.localtion = '武汉';
-      }).catch((error) => {
-        that.localtion = '定位失败';
-        console.log('Error getting location', error);
-      });
+  }
 
-      let watch = this.geolocation.watchPosition();
-      watch.subscribe((data) => {
-       // data can be a set of coordinates, or an error (if an error occurred).
-       // data.coords.latitude
-       // data.coords.longitude
-        that.localtion = '定位失败';
-        that.nativeProvider.showToast('定位失败~')
-       setTimeout(() => { //2秒内没有再次点击返回则将触发标志标记为false
-          that.localtion = '定位中..';
-        }, 2000)
-        //console.log(data.coords.latitude)
+  qrcanner(){
+    if (this.nativeProvider.isMobile()) {
+      this.nativeProvider.scan().subscribe(res => {
+        if(res)
+          this.nativeProvider.alert(res);
       });
+    }
+  }
+
+  game(){
+    this.navCtrl.push('GamePage');
   }
 
   local(){
+    this.localtion = '定位中..';
+    this.nativeProvider.getUserLocation().subscribe((resp) => {
+      this.storage.set('geolocation',resp);
+      this.localtion = resp.road;
+    },error=>{
+      this.localtion = '定位失败';
+      setTimeout(() => { //2秒内没有再次点击返回则将触发标志标记为false
+        this.localtion = '定位';
+      }, 2000)
+    });
 
   }
+
+  
 
    ionViewWillEnter(){
     this.colors = [];
@@ -99,12 +100,23 @@ export class HomePage {
     }
 
      this.getList();
+
+     this.storage.get('geolocation').then((val) => {
+      if(val || val != ''){
+        this.localtion = val.road;
+      }else{
+        this.localtion = '定位';
+        this.local();
+      }
+    })
+
   }
 
   getList(){
     let nowdate = new Date().toLocaleDateString();
         nowdate = nowdate.replace("/",'-').replace("/",'-');
     this.storage.get('lists').then((val) => {
+        console.log(val)
         if(val && val[nowdate])
           this.lists = val[nowdate]
         else
