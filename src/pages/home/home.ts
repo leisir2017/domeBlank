@@ -19,7 +19,13 @@ export class HomePage {
     'assets/imgs/background/background-1.jpg',
     'assets/imgs/background/background-2.jpg',
     'assets/imgs/background/background-3.jpg',
-    'assets/imgs/background/background-4.jpg'
+    'assets/imgs/background/background-4.jpg',
+    'assets/imgs/background/background-5.jpg',
+    'assets/imgs/background/background-6.jpg',
+    'assets/imgs/background/background-7.jpg',
+    'assets/imgs/background/background-8.jpg',
+    'assets/imgs/background/background-9.jpg',
+    'assets/imgs/background/background-10.jpg'
   ];
   constructor(
   public geolocation: Geolocation,
@@ -29,8 +35,19 @@ export class HomePage {
   public storage: Storage,
   public modalCtrl: ModalController
   ) {
-
+    this.backgrounds = this.shuffleArray(this.backgrounds);
   }
+
+  shuffleArray(array) {
+    for (var i = array.length - 1; i > 0; i--) {
+    var j = Math.floor(Math.random() * (i + 1));
+    var temp = array[i];
+    array[i] = array[j];
+    array[j] = temp;
+    }
+    return array;
+  }
+
   golists(){
     this.navCtrl.push('ListPage');
   }
@@ -91,6 +108,7 @@ export class HomePage {
 
   
 
+
    ionViewWillEnter(){
     this.colors = [];
     for(var i=0;i<9;i++)
@@ -113,10 +131,8 @@ export class HomePage {
   }
 
   getList(){
-    let nowdate = new Date().toLocaleDateString();
-        nowdate = nowdate.replace("/",'-').replace("/",'-');
+    let nowdate = this.nativeProvider.getDay(0);
     this.storage.get('lists').then((val) => {
-        console.log(val)
         if(val && val[nowdate])
           this.lists = val[nowdate]
         else
@@ -129,7 +145,7 @@ export class HomePage {
     this.navCtrl.push('WePage');
   }
   domenu(){
-    this.navCtrl.push('AnimatePage');
+    this.modalCtrl.create('AnimatePage').present();
   }
 
 }

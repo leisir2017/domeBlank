@@ -4,13 +4,17 @@ import { AppMinimize } from "@ionic-native/app-minimize";
 import { Toast } from "@ionic-native/toast";
 import { Network } from '@ionic-native/network';
 import { Camera, CameraOptions } from "@ionic-native/camera";
+import { Observable } from "rxjs";
 import { File, FileEntry } from "@ionic-native/file";
 import { FileTransfer, FileTransferObject } from "@ionic-native/file-transfer";
-import { Observable } from "rxjs";
 import { FileOpener } from '@ionic-native/file-opener';
 import { ImagePicker } from "@ionic-native/image-picker";
 import { Diagnostic } from "@ionic-native/diagnostic";
 import { BarcodeScanner } from "@ionic-native/barcode-scanner";
+import { AppVersion } from "@ionic-native/app-version";
+import { APP_DOWNLOAD, APK_DOWNLOAD } from "../Constants";
+import { InAppBrowser } from "@ionic-native/in-app-browser";
+import { UtilsProvider } from "../utils/utils";
 
 declare var LocationPlugin;
 
@@ -22,6 +26,7 @@ declare var LocationPlugin;
 */
 @Injectable()
 export class NativeProvider {
+  private updateProgress: number = -1;
   private loading: Loading;
   private loadingIsOpen: boolean = false;
   constructor(
@@ -30,9 +35,11 @@ export class NativeProvider {
       private camera: Camera,
       private transfer: FileTransfer,
       private fileOpener: FileOpener,
-      private imagePicker: ImagePicker,
       private file: File,
+      private imagePicker: ImagePicker,
+      private appVersion: AppVersion,
       private toastCtrl: ToastController,
+      private inAppBrowser: InAppBrowser,
       private alertCtrl: AlertController,
       private diagnostic: Diagnostic,
       private barcodeScanner: BarcodeScanner,
@@ -41,6 +48,178 @@ export class NativeProvider {
 	  private network: Network
 	) {
     console.log('Hello NativeProvider Provider');
+  }
+
+
+  /**
+   * 下载安装app
+   */
+  downloadApp(): void {
+    if (this.isIos()) {//ios打开网页下载
+      this.openUrlByBrowser(APP_DOWNLOAD);
+      return ;
+    }
+    if (this.isAndroid()) {//android本地下载
+      this.externalStoragePermissionsAuthorization().subscribe(() => {
+        let backgroundProcess = false;//是否后台下载
+        let alert = this.alertCtrl.create({//显示下载进度
+          title: '下载进度：0%',
+          enableBackdropDismiss: false,
+          buttons: [{
+            text: '后台下载', handler: () => {
+              backgroundProcess = true;
+            }
+          }
+          ]
+        });
+        alert.present();
+        const fileTransfer: FileTransferObject = this.transfer.create();
+        //const apk = 'file:///storage/sdcard0/ZhiQingChunDownload/' + `android_${UtilsProvider.getSequence()}.apk`;//apk保存的目录
+        const apk = this.file.externalRootDirectory + `android_${UtilsProvider.getSequence()}.apk`; //apk保存的目录
+        //console.log(APK_DOWNLOAD)
+        //console.log(apk)
+        //下载并安装apk
+        fileTransfer.download(APK_DOWNLOAD, apk).then(() => {
+          window['install'].install(apk.replace('file://', ''));
+          /*
+          this.fileOpener.open( apk.replace('file://', '') , 'application/vnd.android.package-archive')
+          .then(() => console.log('开始安装...'))
+          .catch(e => this.showToast('抱歉，安装文件打开失败！'));
+          */
+          
+        }, err => {
+          this.updateProgress = -1;
+          alert.dismiss();
+          console.log(err, 'android app 本地升级失败');
+          this.alertCtrl.create({
+            title: '前往网页下载',
+            subTitle: '本地升级失败',
+            buttons: [
+              {
+                text: '确定',
+                handler: () => {
+                  this.openUrlByBrowser(APP_DOWNLOAD);//打开网页下载
+                }
+              }
+            ]
+          }).present();
+        });
+
+        let timer = null;//由于onProgress事件调用非常频繁,所以使用setTimeout用于函数节流
+        fileTransfer.onProgress((event: ProgressEvent) => {
+          let progress = Math.floor(event.loaded / event.total * 100);//下载进度
+            console.log(progress)
+
+          this.updateProgress = progress;
+          if (!backgroundProcess) {
+            if (progress === 100) {
+              alert.dismiss();
+            } else {
+              if (!timer) {
+                timer = setTimeout(() => {
+                  clearTimeout(timer);
+                  timer = null;
+                  let title = document.getElementsByClassName('alert-title')[0];
+                  title && (title.innerHTML = `下载进度：${progress}%`);
+                }, 1000);
+              }
+            }
+          }
+        });
+      })
+    }
+  }
+
+  //检测app是否有读取存储权限
+  private externalStoragePermissionsAuthorization = (() => {
+    let havePermission = false;
+    return () => {
+      return Observable.create(observer => {
+        if (havePermission) {
+          observer.next(true);
+        } else {
+          let permissions = [this.diagnostic.permission.READ_EXTERNAL_STORAGE, this.diagnostic.permission.WRITE_EXTERNAL_STORAGE];
+          this.diagnostic.getPermissionsAuthorizationStatus(permissions).then(res => {
+            if (res.READ_EXTERNAL_STORAGE == 'GRANTED' && res.WRITE_EXTERNAL_STORAGE == 'GRANTED') {
+              havePermission = true;
+              observer.next(true);
+            } else {
+              havePermission = false;
+              this.diagnostic.requestRuntimePermissions(permissions).then(res => {//请求权限
+                if (res.READ_EXTERNAL_STORAGE == 'GRANTED' && res.WRITE_EXTERNAL_STORAGE == 'GRANTED') {
+                  havePermission = true;
+                  observer.next(true);
+                } else {
+                  havePermission = false;
+                  this.alertCtrl.create({
+                    title: '缺少读取存储权限',
+                    subTitle: '请在手机设置或app权限管理中开启',
+                    buttons: [{text: '取消'},
+                      {
+                        text: '去开启',
+                        handler: () => {
+                          this.diagnostic.switchToSettings();
+                        }
+                      }
+                    ]
+                  }).present();
+                }
+              }).catch(err => {
+                console.log(err, '调用diagnostic.requestRuntimePermissions方法失败');
+              });
+            }
+          }).catch(err => {
+            console.log(err, '调用diagnostic.getPermissionsAuthorizationStatus方法失败');
+          });
+        }
+      });
+    };
+  })();
+
+  // 前天getDay(-2) 昨天getDay(-1)) 今天getDay(0) 明天getDay(1)
+  getDay(day){  
+     var today = new Date();  
+       
+     var targetday_milliseconds=today.getTime() + 1000*60*60*24*day;          
+
+     today.setTime(targetday_milliseconds); //注意，这行是关键代码    
+       
+     var tYear = today.getFullYear();  
+     var tMonth = today.getMonth();  
+     var tDate = today.getDate();  
+     tMonth = this.doHandleMonth(tMonth + 1);  
+     tDate = this.doHandleMonth(tDate);  
+     return tYear+"-"+tMonth+"-"+tDate;  
+  }  
+
+  doHandleMonth(month){  
+     var m = month;  
+     if(month.toString().length == 1){  
+        m = "0" + month;  
+     }  
+     return m;  
+  }  
+
+  getLocalTime(now) {    
+    now = new Date(now);
+    var   year = now.getFullYear();     
+    var   month = now.getMonth()+1;     
+    var   date = now.getDate();     
+    var   hour = now.getHours();     
+    var   minute = now.getMinutes();     
+    var   second = now.getSeconds();     
+    return   year+"-"+month+"-"+date+"   "+hour+":"+minute+":"+second;  
+
+     //return new Date(parseInt(now) ).toLocaleString().replace(/年|月/g, "-").replace(/日/g, " ");      
+  }   
+
+
+
+  /**
+   * 通过浏览器打开url
+   */
+  openUrlByBrowser(url: string): void {
+    this.inAppBrowser.create(url, '_system');
   }
 
   /**
@@ -136,6 +315,48 @@ export class NativeProvider {
     }
   };
 
+
+  /**
+   * 获得app版本号,如0.01
+   * @description  对应/config.xml中version的值
+   */
+  getVersionNumber(): Observable<string> {
+    return Observable.create(observer => {
+      this.appVersion.getVersionNumber().then((value: string) => {
+        observer.next(value);
+      }).catch(err => {
+        console.log(err, '获得app版本号失败');
+      });
+    });
+  }
+
+  /**
+   * 获得app name,如现场作业
+   * @description  对应/config.xml中name的值
+   */
+  getAppName(): Observable<string> {
+    return Observable.create(observer => {
+      this.appVersion.getAppName().then((value: string) => {
+        observer.next(value);
+      }).catch(err => {
+        console.log(err, '获得app name失败');
+      });
+    });
+  }
+
+  /**
+   * 获得app包名/id,如com.kit.ionic2tabs
+   * @description  对应/config.xml中id的值
+   */
+  getPackageName(): Observable<string> {
+    return Observable.create(observer => {
+      this.appVersion.getPackageName().then((value: string) => {
+        observer.next(value);
+      }).catch(err => {
+        console.log(err, '获得app包名失败');
+      });
+    });
+  }
 
   /**
    * 统一调用此方法显示loading

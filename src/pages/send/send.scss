@@ -10,8 +10,13 @@ page-send {
 	    -webkit-margin-end: 0px;
 	    height: 4rem;
 	    line-height: 3.8rem;
+	    margin: 0px;
 	}
 	.toolbar-ios{
 	    paddding:0px!important;
+	}
+
+	.list-ios > .item-block:first-child{
+	border:00px;
 	}
 }	

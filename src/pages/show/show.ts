@@ -1,5 +1,6 @@
 import { Component } from '@angular/core';
 import { IonicPage, NavController, NavParams,ViewController,ModalController } from 'ionic-angular';
+import { NativeProvider } from '../../providers/native/native';
 
 /**
  * Generated class for the ShowPage page.
@@ -14,12 +15,12 @@ import { IonicPage, NavController, NavParams,ViewController,ModalController } fr
 })
 export class ShowPage {
 	info : any = {};
-  constructor(public navCtrl: NavController,public modalCtrl: ModalController, public navParams: NavParams, public viewCtrl: ViewController) {
+  constructor(public navCtrl: NavController,public modalCtrl: ModalController,public nativeProvider: NativeProvider, public navParams: NavParams, public viewCtrl: ViewController) {
   	this.info = navParams.get("info");
   }
 
   ionViewDidLoad() {
-
+    this.info.time = this.nativeProvider.getLocalTime(this.info.id);
     console.log(this.info);
   }
 

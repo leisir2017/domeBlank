@@ -25,7 +25,7 @@ export class WelcomePage {
 
   goToHome(){
     this.storage.remove('adv');
-    this.navCtrl.push('HomePage');
+    this.navCtrl.setRoot('HomePage');
 
   }
 }

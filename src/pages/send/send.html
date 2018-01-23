@@ -16,7 +16,7 @@
 <ion-content padding>
   <ion-list>
     <ion-item *ngFor="let item of lists, let i = index">
-      <h2>{{ item.msg }}</h2>
+      <p>{{ item.msg }}</p>
       <p>发布日期：{{ item.addtime }}</p>
       <button ion-button clear item-end (click)="info(item)">查看</button>
     </ion-item>

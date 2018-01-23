@@ -69,13 +69,14 @@ export class AddPage {
   	let loader = this.loadingCtrl.create({
       content: "发布中..."
     });
-    let nowdate = new Date().toLocaleDateString();
-        nowdate = nowdate.replace("/",'-').replace("/",'-');
+    let nowdate = this.nativeProvider.getDay(0);
     loader.present();
       this.data.id = new Date().getTime();
       this.data.username = this.user.username;
+      this.data.avatar = this.user.avatar;
       this.data.addtime = nowdate
       this.data.like = 0;
+      this.data.comment = 0;
       
 
    this.storage.get('lists')

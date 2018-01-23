@@ -42,6 +42,7 @@ $colors: (
 );
 
 $toolbar-background: #488aff;
+$content-ios-outer-background: #eee;
 
 // App iOS Variables
 // --------------------------------------------------
@@ -131,3 +132,8 @@ $toolbar-background: #488aff;
 .bordercolor8{
 	border-bottom:1px solid #95caca;
 }
+
+.header-ios .toolbar-ios:last-child .toolbar-background-ios{
+	border-width:0px!important;
+}
+

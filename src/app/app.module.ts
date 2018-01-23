@@ -4,6 +4,8 @@ import { IonicApp, IonicErrorHandler, IonicModule } from 'ionic-angular';
 import { SplashScreen } from '@ionic-native/splash-screen';
 import { StatusBar } from '@ionic-native/status-bar';
 import { AppMinimize } from "@ionic-native/app-minimize";
+import { AppVersion } from "@ionic-native/app-version";
+import { InAppBrowser } from "@ionic-native/in-app-browser";
 import { Network } from "@ionic-native/network";
 import { Toast } from "@ionic-native/toast";
 import { IonicStorageModule } from '@ionic/storage';
@@ -17,10 +19,14 @@ import { File } from "@ionic-native/file";
 import { FileTransfer } from "@ionic-native/file-transfer";
 import { FileOpener } from "@ionic-native/file-opener";
 import { ImagePicker } from "@ionic-native/image-picker";
+import { HttpModule } from "@angular/http";
 
 import { NativeProvider } from '../providers/native/native';
 import { UsertableProvider } from '../providers/usertable/usertable';
 import { User } from '../model/user';
+import { UtilsProvider } from '../providers/utils/utils';
+import { HelperProvider } from '../providers/helper/helper';
+import { HttpserviceProvider } from '../providers/httpservice/httpservice';
 
 @NgModule({
   declarations: [
@@ -28,6 +34,7 @@ import { User } from '../model/user';
   ],
   imports: [
     BrowserModule,
+    HttpModule,
     IonicModule.forRoot(MyApp,{backButtonText:"",iconMode:"ios",modalEnter:"modal-slide-in",modalLeave:"modal-slide-out", tabsPlacement: 'bottom',pageTransition: 'ios','mode':'ios'}),
     IonicStorageModule.forRoot(),
   ],
@@ -39,6 +46,8 @@ import { User } from '../model/user';
     StatusBar,
     SplashScreen,
     AppMinimize,
+    InAppBrowser,
+    AppVersion,
     Network,
     Toast,
     Camera,
@@ -52,7 +61,10 @@ import { User } from '../model/user';
     {provide: ErrorHandler, useClass: IonicErrorHandler},
     NativeProvider,
     UsertableProvider,
-    User
+    User,
+    UtilsProvider,
+    HelperProvider,
+    HttpserviceProvider
   ]
 })
 export class AppModule {}

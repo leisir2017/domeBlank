@@ -1,36 +1,46 @@
-<!--
-  Generated template for the WePage page.
-
-  See http://ionicframework.com/docs/components/#navigation for more info on
-  Ionic pages and navigation.
--->
 <ion-header>
-
   <ion-navbar>
-    <ion-title>个人中心</ion-title>
+    
+    <ion-title>
+      个人中心
+    </ion-title>
+    <ion-buttons right (click)="setting()"> 
+      <button ion-button>设置</button> 
+    </ion-buttons> 
   </ion-navbar>
-
 </ion-header>
 
 
-<ion-content padding>
-	<ion-list class="mine-header">
-    <div ion-item>
-      <ion-thumbnail item-left (click)="viewAvatar(0)">
-        <img [src]="userInfo?.avatar">
-      </ion-thumbnail>
-      <div (click)="edit()">{{userInfo?.username}}</div>
-      <div class="description" (click)="edit()">{{userInfo?.intro}}</div>
-    </div>
-  </ion-list>
+<ion-content>
+
+<div class="ucontent_wrap">
+     
+     <div class="index_top">
+      <dl class="user_info">
+        <dt>
+          <a href="javascript:;">
+            <img (click)="viewAvatar(0)" src="{{userInfo.avatar}}" alt="{{userInfo.username}}" title="{{userInfo.username}}">
+          </a>
+        </dt>
+        <dd>
+            <p class="mt1" *ngIf="userInfo.username"><a href="javascript:;">{{userInfo.username}}</a></p>
+          <div class="commends">
+            <span>{{ userInfo.intro }}</span>
+            <div class="starts"></div>
+          </div>
+        </dd>
+      </dl>
+      <div class="point_area">
+        <span class="point_icon" (click)="edit()"></span>
+      </div>
+     </div>
+    
+ </div>
+
   <ion-list>
     <button ion-item (click)="mylist()">
       <ion-icon name="md-list" item-left color="primary"></ion-icon>
       我的微博
-    </button>
-    <button ion-item (click)="setting()">
-      <ion-icon name="settings" item-left color="primary"></ion-icon>
-      设置
     </button>
     
     <button ion-item (click)="clearCache()">
@@ -54,6 +64,11 @@
     <button ion-item (click)="about()">
       <ion-icon name="information-circle" item-left color="secondary"></ion-icon>
       关于
+    </button>
+    <button ion-item (click)="selectViersion()">
+      <ion-icon name="cloud-download" item-left color="secondary"></ion-icon>
+      版本检测
+      <em>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;当前版本：{{versionCode}}.0</em>
     </button>
     <button ion-item (click)="send()">
       <ion-icon name="send" item-left color="secondary"></ion-icon>
