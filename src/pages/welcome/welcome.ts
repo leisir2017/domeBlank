@@ -1,5 +1,5 @@
-import { Component } from '@angular/core';
-import { IonicPage, NavController, NavParams } from 'ionic-angular';
+import { Component, ViewChild } from '@angular/core';
+import { IonicPage, NavController, NavParams, Slides } from 'ionic-angular';
 import { Storage } from '@ionic/storage';
 
 /**
@@ -15,12 +15,16 @@ import { Storage } from '@ionic/storage';
   templateUrl: 'welcome.html',
 })
 export class WelcomePage {
-
+  @ViewChild(Slides) slides:Slides;  
   constructor(public navCtrl: NavController, public navParams: NavParams, public storage: Storage) {
   }
 
   ionViewDidLoad() {
     console.log('ionViewDidLoad WelcomePage');
+  }
+
+   ngAfterViewInit() {
+    this.slides.slidesPerView = "auto"; 
   }
 
   goToHome(){
