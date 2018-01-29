@@ -1,2 +1,0 @@
-# domeBlank
-ionic blank
