@@ -3,86 +3,96 @@ import {Injectable} from '@angular/core';
 @Injectable()
 export class User {
 
-  private _username: string;
-  private _password: string;
-  private _gender: boolean;
-  private _age: number;
-  private _intro: string;
-  private _email: string;
-  private _phone: string;
-  private _location: string;
-  private _avatar: string = "assets/imgs/avatar.png";
+    private _id:number;
+    private _username:string;
+    private _password:string;
+    private _gender:number;
+    private _age:number;
+    private _intro:string;
+    private _email:string;
+    private _phone:string;
+    private _location:string;
+    private _avatar:string = "assets/imgs/avatar.png";
 
-  
-  get username(): string {
-    return this._username;
-  }
 
-  set username(value: string) {
-    this._username = value;
-  }
+    get id():number {
+        return this._id;
+    }
 
-  get password(): string {
-    return this._password;
-  }
+    set id(value:number) {
+        this._id = value;
+    }
 
-  set password(value: string) {
-    this._password = value;
-  }
+    get username():string {
+        return this._username;
+    }
 
-  get gender(): boolean {
-    return this._gender;
-  }
+    set username(value:string) {
+        this._username = value;
+    }
 
-  set gender(value: boolean) {
-    this._gender = value;
-  }
+    get password():string {
+        return this._password;
+    }
 
-  get age(): number {
-    return this._age;
-  }
+    set password(value:string) {
+        this._password = value;
+    }
 
-  set age(value: number) {
-    this._age = value;
-  }
+    get gender():number {
+        return this._gender;
+    }
 
-  get intro(): string {
-    return this._intro;
-  }
+    set gender(value:number) {
+        this._gender = value;
+    }
 
-  set intro(value: string) {
-    this._intro = value;
-  }
+    get age():number {
+        return this._age;
+    }
 
-  get email(): string {
-    return this._email;
-  }
+    set age(value:number) {
+        this._age = value;
+    }
 
-  set email(value: string) {
-    this._email = value;
-  }
+    get intro():string {
+        return this._intro;
+    }
 
-  get phone(): string {
-    return this._phone;
-  }
+    set intro(value:string) {
+        this._intro = value;
+    }
 
-  set phone(value: string) {
-    this._phone = value;
-  }
+    get email():string {
+        return this._email;
+    }
 
-  get location(): string {
-    return this._location;
-  }
+    set email(value:string) {
+        this._email = value;
+    }
 
-  set location(value: string) {
-    this._location = value;
-  }
-  get avatar(): string {
-    return this._avatar;
-  }
+    get phone():string {
+        return this._phone;
+    }
 
-  set avatar(value: string) {
-    this._avatar = value;
-  }
+    set phone(value:string) {
+        this._phone = value;
+    }
+
+    get location():string {
+        return this._location;
+    }
+
+    set location(value:string) {
+        this._location = value;
+    }
+
+    get avatar():string {
+        return this._avatar;
+    }
+
+    set avatar(value:string) {
+        this._avatar = value;
+    }
 
 }

@@ -29,42 +29,51 @@ import { HelperProvider } from '../providers/helper/helper';
 import { HttpserviceProvider } from '../providers/httpservice/httpservice';
 
 @NgModule({
-  declarations: [
-    MyApp
-  ],
-  imports: [
-    BrowserModule,
-    HttpModule,
-    IonicModule.forRoot(MyApp,{backButtonText:"",iconMode:"ios",modalEnter:"modal-slide-in",modalLeave:"modal-slide-out", tabsPlacement: 'bottom',pageTransition: 'ios','mode':'ios'}),
-    IonicStorageModule.forRoot(),
-  ],
-  bootstrap: [IonicApp],
-  entryComponents: [
-    MyApp
-  ],
-  providers: [
-    StatusBar,
-    SplashScreen,
-    AppMinimize,
-    InAppBrowser,
-    AppVersion,
-    Network,
-    Toast,
-    Camera,
-    File,
-    FileTransfer,
-    FileOpener,
-    ImagePicker,
-    Diagnostic,
-    Geolocation,
-    BarcodeScanner,
-    {provide: ErrorHandler, useClass: IonicErrorHandler},
-    NativeProvider,
-    UsertableProvider,
-    User,
-    UtilsProvider,
-    HelperProvider,
-    HttpserviceProvider
-  ]
+    declarations: [
+        MyApp
+    ],
+    imports: [
+        BrowserModule,
+        HttpModule,
+        IonicModule.forRoot(MyApp, {
+            backButtonText: "",
+            iconMode: "ios",
+            modalEnter: "modal-slide-in",
+            modalLeave: "modal-slide-out",
+            tabsPlacement: 'bottom',
+            pageTransition: 'ios',
+            'mode': 'ios'
+        }),
+        IonicStorageModule.forRoot(),
+    ],
+    bootstrap: [IonicApp],
+    entryComponents: [
+        MyApp
+    ],
+    providers: [
+        StatusBar,
+        SplashScreen,
+        AppMinimize,
+        InAppBrowser,
+        AppVersion,
+        Network,
+        Toast,
+        Camera,
+        File,
+        FileTransfer,
+        FileOpener,
+        ImagePicker,
+        Diagnostic,
+        Geolocation,
+        BarcodeScanner,
+        {provide: ErrorHandler, useClass: IonicErrorHandler},
+        NativeProvider,
+        UsertableProvider,
+        User,
+        UtilsProvider,
+        HelperProvider,
+        HttpserviceProvider
+    ]
 })
-export class AppModule {}
+export class AppModule {
+}

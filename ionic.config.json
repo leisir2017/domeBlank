@@ -1,6 +1,6 @@
 {
-  "name": "demoBlank",
-  "app_id": "",
+  "name": "zhiqingchun",
+  "app_id": "ef67bdce",
   "type": "ionic-angular",
   "integrations": {
     "cordova": {}

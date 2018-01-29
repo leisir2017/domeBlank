@@ -11,19 +11,19 @@ import { NativeProvider } from '../../providers/native/native';
 
 @IonicPage()
 @Component({
-  selector: 'page-game',
-  templateUrl: 'game.html',
+    selector: 'page-game',
+    templateUrl: 'game.html',
 })
 export class GamePage {
 
-  constructor(public navCtrl: NavController, public navParams: NavParams,public nativeProvider: NativeProvider) {
-  }
+    constructor(public navCtrl:NavController, public navParams:NavParams, public nativeProvider:NativeProvider) {
+    }
 
-  ionViewDidLoad() {
-    console.log('ionViewDidLoad GamePage');
-  }
+    ionViewDidLoad() {
+        console.log('ionViewDidLoad GamePage');
+    }
 
-  start(){
-  	this.nativeProvider.showToast("开始个毛线~")
-  }
+    start() {
+        this.nativeProvider.showToast("开始个毛线~")
+    }
 }

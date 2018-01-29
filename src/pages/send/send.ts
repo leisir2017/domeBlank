@@ -13,45 +13,47 @@ import { NativeProvider } from '../../providers/native/native';
 
 @IonicPage()
 @Component({
-  selector: 'page-send',
-  templateUrl: 'send.html',
+    selector: 'page-send',
+    templateUrl: 'send.html',
 })
 export class SendPage {
-	lists : any = [];
-	msg : string = '';
-  constructor(public navCtrl: NavController,
-   	public navParams: NavParams,
-   	public nativeProvider: NativeProvider,
-   	public user: User,
-   	public storage: Storage) {
-  }
+    lists:any = [];
+    msg:string = '';
 
-  ionViewDidLoad() {
-    console.log('ionViewDidLoad SendPage');
-  }
-  ionViewWillLoad() {
-     this.getList();
-  }
+    constructor(public navCtrl:NavController,
+                public navParams:NavParams,
+                public nativeProvider:NativeProvider,
+                public user:User,
+                public storage:Storage) {
+    }
 
-  send(){
-  	let id =  new Date().getTime();
-  	let addtime = new Date().toLocaleDateString();
-        addtime = addtime.replace("/",'-').replace("/",'-');
-  	if(this.msg!=''){
-  		this.lists.push({id:id,username:this.user.username,msg:this.msg,addtime:addtime});
-  		this.storage.set('feedback',this.lists);
-  		this.nativeProvider.showToast('反馈成功');
-  		this.msg = '';
-  	}
-  }
+    ionViewDidLoad() {
+        console.log('ionViewDidLoad SendPage');
+    }
 
-  getList(){
-    this.storage.get('feedback').then((val) => {
-        if(val && val != '')
-          this.lists = val
-        else
-          this.lists = [];
-    });
-  }
+    ionViewWillLoad() {
+        this.getList();
+    }
+
+    send() {
+        let id = new Date().getTime();
+        let addtime = new Date().toLocaleDateString();
+        addtime = addtime.replace("/", '-').replace("/", '-');
+        if (this.msg != '') {
+            this.lists.push({id: id, username: this.user.username, msg: this.msg, addtime: addtime});
+            this.storage.set('feedback', this.lists);
+            this.nativeProvider.showToast('反馈成功');
+            this.msg = '';
+        }
+    }
+
+    getList() {
+        this.storage.get('feedback').then((val) => {
+            if (val && val != '')
+                this.lists = val
+            else
+                this.lists = [];
+        });
+    }
 
 }
