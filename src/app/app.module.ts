@@ -20,6 +20,10 @@ import { FileTransfer } from "@ionic-native/file-transfer";
 import { FileOpener } from "@ionic-native/file-opener";
 import { ImagePicker } from "@ionic-native/image-picker";
 import { HttpModule } from "@angular/http";
+import { StreamingMedia } from '@ionic-native/streaming-media';
+import { Media } from '@ionic-native/media';
+import { MusicControls } from '@ionic-native/music-controls';
+import { NativeAudio } from '@ionic-native/native-audio';
 
 import { NativeProvider } from '../providers/native/native';
 import { UsertableProvider } from '../providers/usertable/usertable';
@@ -27,6 +31,8 @@ import { User } from '../model/user';
 import { UtilsProvider } from '../providers/utils/utils';
 import { HelperProvider } from '../providers/helper/helper';
 import { HttpserviceProvider } from '../providers/httpservice/httpservice';
+import { HttpClientModule } from "@angular/common/http";
+import { ApiProvider } from '../providers/api/api';
 
 @NgModule({
     declarations: [
@@ -35,6 +41,7 @@ import { HttpserviceProvider } from '../providers/httpservice/httpservice';
     imports: [
         BrowserModule,
         HttpModule,
+        HttpClientModule,
         IonicModule.forRoot(MyApp, {
             backButtonText: "",
             iconMode: "ios",
@@ -63,6 +70,10 @@ import { HttpserviceProvider } from '../providers/httpservice/httpservice';
         FileTransfer,
         FileOpener,
         ImagePicker,
+        Media,
+        MusicControls,
+        NativeAudio,
+        StreamingMedia,
         Diagnostic,
         Geolocation,
         BarcodeScanner,
@@ -72,7 +83,8 @@ import { HttpserviceProvider } from '../providers/httpservice/httpservice';
         User,
         UtilsProvider,
         HelperProvider,
-        HttpserviceProvider
+        HttpserviceProvider,
+    ApiProvider
     ]
 })
 export class AppModule {

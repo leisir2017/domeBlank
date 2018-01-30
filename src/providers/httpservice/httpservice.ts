@@ -64,6 +64,7 @@ export class HttpserviceProvider {
     public request(url:string, options:RequestOptionsArgs):Observable<Response> {
         let oldurl = url;
         let oldoptions = options;
+
         url = UtilsProvider.formatUrl(url.startsWith('http') ? url : APP_SERVE_URL + url);
         this.optionsAddToken(options);
         return Observable.create(observer => {
@@ -77,6 +78,7 @@ export class HttpserviceProvider {
                 if (results.code == 403) {
                     this.getToken('index/token', {url: oldurl, options: oldoptions});
                 } else {
+                    this.nativeProvider.hideLoading();
                     observer.next(res);
                 }
             }, err => {
@@ -87,6 +89,7 @@ export class HttpserviceProvider {
     }
 
     public get(url:string, paramMap:any = null):Observable<Response> {
+        this.nativeProvider.showLoading();
         return this.request(url, new RequestOptions({
             method: RequestMethod.Get,
             search: HttpserviceProvider.buildURLSearchParams(paramMap)
@@ -94,6 +97,7 @@ export class HttpserviceProvider {
     }
 
     public post(url:string, body:any = {}):Observable<Response> {
+        this.nativeProvider.showLoading();
         return this.request(url, new RequestOptions({
             method: RequestMethod.Post,
             body: body,

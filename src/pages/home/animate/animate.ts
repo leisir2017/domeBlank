@@ -1,5 +1,6 @@
 import { Component } from '@angular/core';
-import { IonicPage, NavController, NavParams,ViewController } from 'ionic-angular';
+import { IonicPage, NavController, NavParams,ViewController,ModalController } from 'ionic-angular';
+import { HttpserviceProvider } from '../../../providers/httpservice/httpservice';
 
 /**
  * Generated class for the AnimatePage page.
@@ -14,99 +15,108 @@ import { IonicPage, NavController, NavParams,ViewController } from 'ionic-angula
     templateUrl: 'animate.html',
 })
 export class AnimatePage {
-
-    imgitem:any = [
-        "https://timgsa.baidu.com/timg?image&quality=80&size=b9999_10000&sec=1516601408640&di=207a27ca90b19c319bf8514fb66967a0&imgtype=0&src=http%3A%2F%2Ftx.haiqq.com%2Fuploads%2Fallimg%2F150325%2F122251J12-10.jpg",
-        "https://www.baidu.com/img/bd_logo1.png",
-        "https://timgsa.baidu.com/timg?image&quality=80&size=b9999_10000&sec=1516615634642&di=d85aeb2a9dffdde7f4a56864fec52101&imgtype=0&src=http%3A%2F%2Fimg.zcool.cn%2Fcommunity%2F018d4e554967920000019ae9df1533.jpg%40900w_1l_2o_100sh.jpg"
-    ]
-    canmove:any = false;
-
-    constructor(public navCtrl:NavController, public navParams:NavParams, public viewCtrl:ViewController) {
+    hotMovies:any = [];
+    comingMovies:any = [];
+    rooms:any = [];
+    nextbtn:any = true;
+    comingnextbtn:any = true;
+    roomnextbtn:any = true;
+    offset:any = 0;
+    pet: string = "热映电影";
+    type: string = "hot";
+    constructor(public httpserviceProvider: HttpserviceProvider,
+                public navCtrl:NavController,
+                public modalCtrl:ModalController,
+                public navParams:NavParams,
+                public viewCtrl:ViewController) {
     }
 
     ionViewDidLoad() {
         console.log('ionViewDidLoad AnimatePage');
+        this.getHotMovies();
+        this.getComingMovies();
+        this.getMoviesRoom();
     }
 
     dismiss() {
         this.viewCtrl.dismiss();
     }
 
-
-    ngOnInit() {
-
-    }
-
-    tapEvent($event) {
-        console.log("tap" + $event.srcEvent.clientX + "," + $event.srcEvent.clientY)
-
-    }
-
-    OnInit() {
-        alert("2")
-    }
-
-    //长按手势
-    pressEvent($event) {
-        if ($event.isFirst) {
-            //边框
-            $event.srcEvent.target.style.border = "5px solid red";
-            //设置图片为fix
-            $event.srcEvent.target.style.position = "fixed";
-            //图片中心变为鼠标鼠标；
-            $event.srcEvent.target.style.left = $event.srcEvent.clientX - ($event.srcEvent.target.clientWidth / 2) + "px";
-            $event.srcEvent.target.style.top = $event.srcEvent.clientY - ($event.srcEvent.target.clientHeight / 2) + "px";
-            //设置成可以移动
-            this.canmove = true
-            console.log($event)
-        }
-    }
-
-    //拖动手势
-    panEvent($event) {
-        //如果可以移动
-        if (this.canmove) {
-            //图片中心随着鼠标移动而移动
-            $event.srcEvent.target.style.left = $event.srcEvent.clientX - ($event.srcEvent.target.clientWidth / 2) + "px";
-            $event.srcEvent.target.style.top = $event.srcEvent.clientY - ($event.srcEvent.target.clientHeight / 2) + "px";
-            if ($event.isFinal) {
-                console.log($event)
-                this.canmove = false;
-                //取当前图片中心到所有被选图片中心的距离，并且取出x,y小于图片长宽/2的一个；如果都不满足则归位；满足则替换url；
-                var imglist:any = window.document.getElementsByClassName("dddd");
-                for (let i = 0; i < imglist.length; i++) {
-                    console.log(Math.abs($event.srcEvent.clientX - imglist[i].x - $event.srcEvent.target.clientWidth / 2) + "," + Math.abs($event.srcEvent.clientY - imglist[i].y - $event.srcEvent.target.clientHeight / 2))
-                    if (
-                        //当前图中心之差XY都要小于图片长宽一半
-                    Math.abs($event.srcEvent.clientX - imglist[i].x - $event.srcEvent.target.clientWidth / 2) < $event.srcEvent.target.clientWidth / 2 &&
-                    Math.abs($event.srcEvent.clientY - imglist[i].y - $event.srcEvent.target.clientHeight / 2) < $event.srcEvent.target.clientHeight / 2 &&
-                        //剔除拖拽图片本身
-                    Math.abs($event.srcEvent.clientX - imglist[i].x - $event.srcEvent.target.clientWidth / 2) != 0 &&
-                    Math.abs($event.srcEvent.clientY - imglist[i].y - $event.srcEvent.target.clientHeight / 2) != 0
-                    ) {
-                        console.log("目标图片" + imglist[i].src);
-                        console.log("当前图片" + $event.target.src);
-                        var a = imglist[i].src;
-                        imglist[i].src = $event.target.src;
-                        $event.target.src = a;
-                    }
-                }
-                //归位
-                $event.srcEvent.target.style.position = "";
-                //取消边框
-                $event.srcEvent.target.style.border = "0px";
-                console.log("结束" + $event.srcEvent.target.style.left + "," + $event.srcEvent.target.style.top)
+    getHotMovies() {
+        let offset = this.offset*10;
+        let hotMoviesUrl: string = "http://m.maoyan.com/movie/list.json?type=hot&offset="+offset+"&limit=10";
+        this.httpserviceProvider.get(hotMoviesUrl).subscribe(data => {
+           var datas = data['_body'];
+            if(datas){
+                datas = JSON.parse(datas);
+                this.nextbtn = datas["data"]["hasNext"];
+                for (var i=0;i<datas["data"]["movies"].length;i++)
+                    this.hotMovies.push(datas["data"]["movies"][i]);
             }
+        });
+    }
+
+    // 即将上映
+    getComingMovies() {
+        let offset = this.offset*10;
+        let Url: string = "http://m.maoyan.com/movie/list.json?type=coming&offset="+offset+"&limit=10";
+        this.httpserviceProvider.get(Url).subscribe(data => {
+           var datas = data['_body'];
+            if(datas){
+                datas = JSON.parse(datas);
+                this.comingnextbtn = datas["data"]["hasNext"];
+                for (var i=0;i<datas["data"]["movies"].length;i++)
+                    this.comingMovies.push(datas["data"]["movies"][i]);
+            }
+        });
+    }
+    // 影院
+    getMoviesRoom() {
+        let offset = this.offset*10;
+        let Url: string = "http://m.maoyan.com/cinemas.json?offset="+offset+"&limit=10";
+        this.httpserviceProvider.get(Url).subscribe(data => {
+           var datas = data['_body'];
+            if(datas){
+                datas = JSON.parse(datas);
+                this.roomnextbtn = false;
+                var i = 0;
+                for(var variable in datas["data"]){   //variable  为 index
+                    if( variable ){
+                        i++;
+                        for (var j = 0;j<datas["data"][variable].length;j++){
+                            this.rooms.push(datas["data"][variable][j]);
+                        }
+                        if(i>4)
+                            break;
+                    }
+
+                }
+            }
+        });
+    }
+    settype(type){
+        this.type = type;
+    }
+    loadmore(){
+        this.offset = this.offset + 1;
+        this.getHotMovies();
+    }
+
+    showmovie(id){
+        let modal = this.modalCtrl.create('MoviePage', {"id":id});
+        modal.present();
+    }
+    showroom(id){
+
+    }
+
+    viewerPicture(index) {//照片预览
+        let picturePaths = [];
+        for (let fileObj of this.hotMovies) {
+            picturePaths.push(fileObj.img);
         }
+        this.modalCtrl.create('ImgviewPage', {'initialSlide': index, 'picturePaths': picturePaths}).present();
     }
 
-    rotate($event) {
-        console.log("rotate")
-    }
-
-    pinch($event) {
-        console.log("pinch")
-    }
 
 }

@@ -89,7 +89,7 @@ export class HomePage {
         this.localtion = '定位中..';
         this.nativeProvider.getUserLocation().subscribe((resp) => {
             this.storage.set('geolocation', resp);
-            this.localtion = resp.road;
+            this.localtion = resp.road?resp.road:'定位失败';
         }, error=> {
             this.localtion = '定位失败';
             setTimeout(() => { //2秒内没有再次点击返回则将触发标志标记为false
@@ -110,8 +110,8 @@ export class HomePage {
         this.getList();
 
         this.storage.get('geolocation').then((val) => {
-            if (val || val != '') {
-                this.localtion = val.road;
+            if (val && val != '') {
+                this.localtion = val.road?val.road:'定位失败';
             } else {
                 this.localtion = '定位';
                 this.local();
